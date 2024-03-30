@@ -35,7 +35,7 @@ const rombus = "M 0 -60 L -200 0 L 0 60 L 200 0  Z";
 
 
 const shapes = [pill, rombus, peanut];
-const colors = ["#FF0000", "#009800", "#5a00ff"];
+const colors = ["#FF0000", "#009800", "#7300ff"];
 const fills = ["white", "url(#diaHatch)", "none"];
 
 
