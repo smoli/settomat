@@ -63,7 +63,6 @@ describe("board", () => {
 
     });
 
-
     test("creating a deck with 4 features", () => {
         const d = createDeck();
 

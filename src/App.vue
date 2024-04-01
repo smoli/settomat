@@ -2,7 +2,7 @@
     <div>
 
         <h1>Settomat</h1>
-        <Board></Board>
+        <RouterView></RouterView>
     </div>
 </template>
 
