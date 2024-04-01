@@ -31,7 +31,6 @@ h1 {
 
 
 #app {
-    border: 1px solid rebeccapurple;
     margin: 0 auto;
     padding: 0;
     text-align: center;
@@ -42,7 +41,6 @@ h1 {
 
 
 .board {
-    border: 1px solid red;
     margin-top: 1em;
     display: grid;
     gap: 1vw;
@@ -61,18 +59,37 @@ h1 {
     box-shadow: 0.1em 0.1em 0.21em rgba(0, 0, 0, 0.3);
 }
 
+
+.button {
+    display: inline-block;
+    font-size: 2em;
+    font-weight: bold;
+    text-decoration: none;
+    border: 5px solid cornflowerblue;
+    border-radius: 1em;
+    margin: 1em;
+    padding: 1em 2em;
+    background-color: white;
+    color: cornflowerblue;
+    text-transform: uppercase;
+}
+
 @media (max-width: 600px) {
     .board {
         margin-top: 1em;
         display: grid;
-        grid-gap: 0;
+        grid-gap: 2vw;
         padding: 0;
     }
 
     .card {
         display: inline-block;
         border-radius: 2vw;
-        width: 20vw;
-        height: 33.33vw;
+        width: 22vw;
+        height: 36.66vw;
+    }
+
+    .button {
+        font-size: 1em;
     }
 }

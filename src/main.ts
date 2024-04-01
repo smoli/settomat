@@ -4,14 +4,17 @@ import App from './App.vue'
 
 
 import Board from "./components/Board.vue";
-import {createMemoryHistory, createRouter} from "vue-router";
+import Menu from "./components/Menu.vue";
+import {createMemoryHistory, createRouter, createWebHashHistory} from "vue-router";
 
 const routes = [
-    { path: "/", component: Board}
+    { path: "/", component: Menu},
+    { path: "/play/:features", component: Board, props: true },
+
 ];
 
 const router = createRouter({
-    history: createMemoryHistory(), routes
+    history: createWebHashHistory(), routes
 });
 
 

@@ -1,13 +1,16 @@
 <template>
-    <div v-if="!gameEnded">
-        <span>Timer: {{ timer }}</span><br/>
-        <button @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Da ist kein Set</button>
+    <div class="info">
+        <span id="timer">Timer: {{ timer }}</span><br/>
+        <button class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Kein Set
+        </button>
         <!--    <button @click="shrink">Shrink {{ boardSize}}</button>-->
         <br>
-        <span>Sets gefunden: {{ setsFound }}</span>
-        <span>Punkte: {{ points }}</span>
-        <!--        <span>Gibt's eins: {{ hasASet ? 'Ja' : 'Nein' }}</span>-->
-        <span>Stapel: {{ deck.length }}</span>
+        <span id="setCount">Gefunden: {{ setsFound }}</span>
+        <span id="points">Punkte: {{ points }}</span>
+        <span id="deckSize">Stapel: {{ deck.length }}</span>
+    </div>
+
+    <div v-if="!gameEnded">
 
         <div class="board" :style="{ gridTemplateColumns: boardColumns}">
             <div v-for="c of boardCards">
@@ -46,7 +49,7 @@
 import Card from "./Card.vue";
 import {computed, ref} from "vue";
 import {ICard} from "../ICard.ts";
-import {checkForSet, createDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
+import {checkForSet, createDeck, createReducedDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
 import {createEmptyBoard, fillBoard, growBoard, rearrangeBoard} from "../boardFunctions.ts";
 
 
@@ -57,17 +60,33 @@ const points = ref(0);
 const boardCards = ref<(ICard | boolean)[]>([]);
 
 
+const props = defineProps<{ features: string }>();
+
 const deck = ref<ICard[]>([]);
 const selection = ref<ICard[]>([]);
 
 boardSize.value = 12;
 
 function resetDeck() {
-    deck.value = createDeck(81);
+
+    if (props.features === "all") {
+        deck.value = createDeck(81);
+    }
+
+    if (props.features === "3") {
+        deck.value = createReducedDeck({color: null, count: null, filling: 2, shape: null})
+    }
+
 }
 
 const boardColumns = computed(() => {
-    return Array.from(Array(boardSize.value / 3).keys()).map(() => "1fr").join(" ");
+
+    if (window.innerWidth <= 600) {
+        return "1fr 1fr 1fr 1fr";
+    } else {
+        return Array.from(Array(boardSize.value / 3).keys()).map(() => "1fr").join(" ");
+    }
+
 });
 
 
@@ -214,7 +233,7 @@ function clearBoard() {
 const wrongSayingNoSet = ref(false);
 
 function userSaysNoSet() {
-    if (hasASet.value) {
+    if (!hasASet.value) {
 
         deductPoints(timer.value);
 
@@ -287,17 +306,22 @@ span {
     background-color: red;
 }
 
-
-button {
-    border-radius: 8px;
-    border: 1px solid transparent;
-    padding: 0.6em 1.2em;
-    font-size: 1em;
-    font-weight: 500;
-    font-family: inherit;
-    background-color: #1a1a1a;
-    cursor: pointer;
-    color: inherit;
+#timer, #setCount, #points, #deckSize {
+    display: inline-block;
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #4d4d4d;
 }
+
+@media (max-width: 600px) {
+    #timer, #setCount, #points, #deckSize {
+        font-size: 1em;
+}
+}
+
+.button {
+    margin: 0.5em;
+}
+
 
 </style>
