@@ -1,6 +1,5 @@
 <template>
     <div v-if="!gameEnded">
-
         <span>Timer: {{ timer }}</span><br/>
         <button @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Da ist kein Set</button>
         <!--    <button @click="shrink">Shrink {{ boardSize}}</button>-->
@@ -30,7 +29,7 @@
         <svg width="1" height="1">
             <defs>
                 <pattern id="diaHatch" viewBox="0,0,30,10" width="10%" height="10%" patternTransform="rotate(45)">
-                    <line x1="0"  y1="0" x2="20"  y2="0" stroke-width="25" stroke="white"/>
+                    <line x1="0" y1="0" x2="20" y2="0" stroke-width="25" stroke="white"/>
                 </pattern>
             </defs>
 
@@ -277,23 +276,7 @@ reset();
 </script>
 
 <style scoped>
-.board {
-    margin-top: 1em;
-    display: grid;
-    gap: 1em;
-    grid-gap: 1em;
-    width: 40em;
-}
 
-@media (max-width: 600px) {
-    .board {
-        margin-top: 1em;
-        display: grid;
-        grid-gap: 0.2em;
-        width: 100%;
-        padding: 1em;
-    }
-}
 
 span {
     margin: 1em;
@@ -314,16 +297,7 @@ button {
     font-family: inherit;
     background-color: #1a1a1a;
     cursor: pointer;
-    transition: border-color 0.25s;
-}
-
-button:hover {
-    border-color: #646cff;
-}
-
-button:focus,
-button:focus-visible {
-    outline: 4px auto -webkit-focus-ring-color;
+    color: inherit;
 }
 
 </style>

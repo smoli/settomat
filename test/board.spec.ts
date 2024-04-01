@@ -1,6 +1,6 @@
 import {describe, expect, test} from "vitest";
 import {createEmptyBoard, fillBoard, growBoard, rearrangeArray, rearrangeBoard} from "../src/boardFunctions";
-import {createDeck} from "../src/deckFunctions";
+import {createDeck, createReducedDeck} from "../src/deckFunctions";
 
 describe("board", () => {
     test("create an empty board", () => {
@@ -44,11 +44,7 @@ describe("board", () => {
         b[1] = false;
         b[2] = false;
 
-        console.log("B", b);
         b = rearrangeBoard(b);
-
-        console.log("B", b);
-        console.log("B2", b2);
 
         expect(b[0]).to.eq(b2[0]);
         expect(b[1]).to.eq(b2[3]);
@@ -59,13 +55,32 @@ describe("board", () => {
     });
 
     test("rearrange", () => {
-       const b = [1, false, false, 4, 5, 6];
-       const r = rearrangeArray(b, false);
+        const b = [1, false, false, 4, 5, 6];
+        const r = rearrangeArray(b, false);
 
-       console.log(b);
-       console.log(r);
 
-       expect(r).to.deep.eq([1, 4, 5, 6, false, false]);
+        expect(r).to.deep.eq([1, 4, 5, 6, false, false]);
 
+    });
+
+
+    test("creating a deck with 4 features", () => {
+        const d = createDeck();
+
+        expect(d.length).to.eq(81);
+    });
+
+    test("creating a deck with 3 features", () => {
+        let d = createReducedDeck({ color: null, shape: null, filling: null, count: 1 });
+        expect(d.length).to.eq(27);
+        d.forEach(c => expect(c.count).to.eq(1));
+
+        d = createReducedDeck({ color: 0, shape: null, filling: null, count: null });
+        expect(d.length).to.eq(27);
+        d.forEach(c => expect(c.color).to.eq(0));
+
+        d = createReducedDeck({ color: null, shape: 2, filling: null, count: null });
+        expect(d.length).to.eq(27);
+        d.forEach(c => expect(c.shape).to.eq(2));
     });
 });

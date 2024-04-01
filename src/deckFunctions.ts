@@ -1,5 +1,12 @@
 import {ICard} from "./ICard.ts";
 
+export interface IFeatrues {
+    color: null | 0 | 1 | 2;
+    shape: null | 0 | 1 | 2;
+    filling: null | 0 | 1 | 2;
+    count: null | 1 | 2 | 3;
+}
+
 export function createDeck(max: number = 81): ICard[] {
     const r: ICard[] = [];
 
@@ -9,17 +16,40 @@ export function createDeck(max: number = 81): ICard[] {
                 for (let count = 1; count < 4; count++) {
                     r.push({
                         shape, color, filling, count, selected: false
-                    })
+                    });
 
-                    if (r.length === max) {
+                    if (r.length >= max) {
                         return r;
                     }
+
                 }
             }
         }
     }
 
     return r;
+}
+
+
+export function createReducedDeck(features: IFeatrues): ICard[] {
+    return createDeck().filter(c => {
+        let r = true;
+
+       if (typeof features.count === "number") {
+           r = r && (c.count === features.count)
+       }
+       if (typeof features.shape === "number") {
+           r = r && (c.shape === features.shape)
+       }
+       if (typeof features.color === "number") {
+           r = r && (c.color === features.color)
+       }
+       if (typeof features.filling === "number") {
+           r = r && (c.filling === features.filling)
+       }
+
+       return r;
+    });
 }
 
 export function shuffle(deck: ICard[]) {

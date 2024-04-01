@@ -1,7 +1,10 @@
 <template>
     <div class="card" :class="{ selected: selected, error: error }" @click="onClicked()">
         <svg v-if="!back" class="render" viewBox="-300 -500 600 1000">
-            <circle r="50" v-if="tip" cx="-200" cy="-400" fill="black"></circle>
+
+            <g transform="translate(-200, -450) scale(10, 10) rotate(45)" v-if="tip">
+                <polygon points="0,0 2,5 0,10 5,8 10,10 8,5 10,0 5,2" fill="gold"/>
+            </g>
 
             <g v-for="y in yPosition" :transform="`translate(0, ${y})`">
                 <path class="icon" :d="shape" :style="{
@@ -85,29 +88,11 @@ function onClicked() {
 </script>
 
 <style scoped>
-.card {
-    display: inline-block;
-    width: 6em;
-    height: 10em;
-    border-radius: 1em;
-    padding: 0;
-    overflow: clip;
-    border: 0.2em solid white;
-    box-shadow: 0.1em 0.1em 0.21em rgba(0, 0, 0, 0.3);
-}
-
-@media (max-width: 600px) {
-    .card {
-        display: inline-block;
-        width: 4em;
-        height: 6.66em;
-    }
-}
 
 
 .card.selected {
     border-color: cornflowerblue;
-    box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.3);
+    /*box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.3);*/
 }
 
 .card.error {
