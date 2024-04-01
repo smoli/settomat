@@ -19,6 +19,7 @@
                       :count="c.count"
                       :selected="c.selected"
                       :error="c.error"
+                      :tip="aSet.indexOf(c) !== -1"
 
                       @clicked="onCardSelected(c)"
                 ></Card>
@@ -46,7 +47,7 @@
 import Card from "./Card.vue";
 import {computed, ref} from "vue";
 import {ICard} from "../ICard.ts";
-import {checkForSet, createDeck, isSet, shuffle} from "../deckFunctions.ts";
+import {checkForSet, createDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
 import {createEmptyBoard, fillBoard, growBoard, rearrangeBoard} from "../boardFunctions.ts";
 
 
@@ -227,6 +228,24 @@ function userSaysNoSet() {
         grow();
     }
 }
+
+
+const aSet = computed(() => {
+    if (timer.value > 20) {
+        return [];
+    }
+
+    const r = getASet(boardCards.value.filter(c => typeof c !== "boolean") as ICard[]);
+
+    r.pop();
+
+    if (timer.value > 10) {
+        r.pop();
+    }
+
+
+    return r;
+})
 
 const gameEnded = computed(() => {
     if (hasASet.value) {

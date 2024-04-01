@@ -67,3 +67,24 @@ export function checkForSet(cards: ICard[]): boolean {
     }
     return false;
 }
+
+export function getASet(cards: ICard[]): ICard[] {
+
+    for (let c1 of cards) {
+        for (let c2 of cards) {
+            if (c1 === c2) {
+                continue;
+            }
+            for (let c3 of cards) {
+                if (c1 === c3 || c2 === c3) {
+                    continue;
+                }
+
+                if (isSet(c1, c2, c3)) {
+                    return [c1, c2, c3];
+                }
+            }
+        }
+    }
+    return [];
+}

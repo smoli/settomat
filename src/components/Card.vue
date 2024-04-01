@@ -1,6 +1,7 @@
 <template>
     <div class="card" :class="{ selected: selected, error: error }" @click="onClicked()">
         <svg v-if="!back" class="render" viewBox="-300 -500 600 1000">
+            <circle r="50" v-if="tip" cx="-200" cy="-400" fill="black"></circle>
 
             <g v-for="y in yPosition" :transform="`translate(0, ${y})`">
                 <path class="icon" :d="shape" :style="{
@@ -32,7 +33,8 @@ const props = defineProps<{
     count?: number,
     selected?: boolean,
     error?: boolean,
-    back?: boolean
+    back?: boolean,
+    tip?: boolean
 }>();
 
 const emits = defineEmits(["clicked"]);
@@ -101,7 +103,6 @@ function onClicked() {
         height: 6.66em;
     }
 }
-
 
 
 .card.selected {
