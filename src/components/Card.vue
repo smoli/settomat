@@ -44,20 +44,22 @@ const rombus = "M 0 -60 L -200 0 L 0 60 L 200 0  Z";
 
 const shapes = [pill, rombus, peanut];
 const colors = ["#FF0000", "#009800", "#7300ff"];
-const fills = ["white", "url(#diaHatch)", "none"];
+
+const hatchURL = "url(" + location.protocol + '//' + location.host + location.pathname + "#diaHatch)";
+const fills = ["white", hatchURL, "none"];
 
 
 const shape = computed(() => {
-    return shapes[props.shape];
+    return shapes[props.shape as number];
 });
 
 const color = computed(() => {
-    return colors[props.color];
+    return colors[props.color as number];
 });
 
 
 const fillType = computed(() => {
-    return fills[props.filling];
+    return fills[props.filling as number];
 })
 
 const yPosition = computed(() => {

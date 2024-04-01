@@ -7,7 +7,7 @@
         <br>
         <span>Sets gefunden: {{ setsFound }}</span>
         <span>Punkte: {{ points }}</span>
-<!--        <span>Gibt's eins: {{ hasASet ? 'Ja' : 'Nein' }}</span>-->
+        <!--        <span>Gibt's eins: {{ hasASet ? 'Ja' : 'Nein' }}</span>-->
         <span>Stapel: {{ deck.length }}</span>
 
         <div class="board" :style="{ gridTemplateColumns: boardColumns}">
@@ -27,15 +27,17 @@
         </div>
 
         <svg width="1" height="1">
-            <pattern id="diaHatch" width="1" height="25" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)">
-                <line x1="0" x2="100%" y1="0" y2="0" stroke-width="25" stroke="white"/>
-            </pattern>
+            <defs>
+                <pattern id="diaHatch" viewBox="0,0,30,10" width="10%" height="10%" patternTransform="rotate(45)">
+                    <line x1="0"  y1="0" x2="20"  y2="0" stroke-width="25" stroke="white"/>
+                </pattern>
+            </defs>
 
         </svg>
     </div>
     <div v-if="gameEnded">
         <h1>Fertig</h1>
-        <p>Du hast {{setsFound}} Sets gefunden und {{points}} Punkte.</p>
+        <p>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</p>
         <button @click="reset">Noch mal!</button>
     </div>
 </template>
@@ -45,7 +47,7 @@ import Card from "./Card.vue";
 import {computed, ref} from "vue";
 import {ICard} from "../ICard.ts";
 import {checkForSet, createDeck, isSet, shuffle} from "../deckFunctions.ts";
-import {createEmptyBoard, growBoard, rearrangeBoard} from "../boardFunctions.ts";
+import {createEmptyBoard, fillBoard, growBoard, rearrangeBoard} from "../boardFunctions.ts";
 
 
 const boardSize = ref(0);
@@ -87,29 +89,29 @@ function onCardSelected(c: ICard) {
     }
 
     if (selection.value.length === 3) {
-       if (isSet(selection.value[0], selection.value[1], selection.value[2])) {
-           setsFound.value += 1;
-           points.value += timer.value;
-           timer.value = 120;
-           removeCardsFromBoard(selection.value);
-           shrink(12);
-           fillBoard();
-           selection.value = []
-       } else {
-           deductPoints(timer.value);
+        if (isSet(selection.value[0], selection.value[1], selection.value[2])) {
+            setsFound.value += 1;
+            points.value += timer.value;
+            timer.value = 120;
+            removeCardsFromBoard(selection.value);
+            shrink(12);
+            fill();
+            selection.value = []
+        } else {
+            deductPoints(timer.value);
 
-           selection.value.forEach(c => {
-               c.selected = false;
-               c.error = true;
-           })
+            selection.value.forEach(c => {
+                c.selected = false;
+                c.error = true;
+            })
 
-           setTimeout(() => {
-               selection.value.forEach(c => {
-                   c.error = false;
-               });
-               deselectAll();
-           }, 1000);
-       }
+            setTimeout(() => {
+                selection.value.forEach(c => {
+                    c.error = false;
+                });
+                deselectAll();
+            }, 1000);
+        }
     }
 }
 
@@ -147,28 +149,20 @@ function removeCardsFromBoard(cards: ICard[]) {
 }
 
 
-function rearrangeOversizeBoard() {
-    if (boardCards.value.length > 12) {
+function fill() {
+    boardCards.value = fillBoard(boardCards.value, deck.value);
 
-    }
-}
-
-
-function fillBoard() {
-    boardCards.value = boardCards.value.map(c => {
-        if (c) {
-            return c
-        } else {
-            if (deck.value.length === 0) {
-                return false;
-            }
-            return deck.value.shift();
+    boardCards.value.forEach(c => {
+        if (typeof c === "boolean") {
+            return;
         }
+        console.log(c.shape, c.filling, c.color, c.count);
     });
+
 }
 
 
-let interval;
+let interval: number = -1;
 
 function startTimer() {
     timer.value = 120;
@@ -192,7 +186,7 @@ const hasASet = computed(() => {
 function grow() {
     boardSize.value += 3;
     boardCards.value = growBoard(boardCards.value, 3);
-    fillBoard();
+    fill();
 }
 
 function shrink(min: number = 12) {
@@ -255,7 +249,7 @@ function reset() {
     resetDeck();
     shuffleDeck();
     clearBoard();
-    fillBoard();
+    fill();
     startTimer();
 }
 
@@ -303,9 +297,11 @@ button {
     cursor: pointer;
     transition: border-color 0.25s;
 }
+
 button:hover {
     border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
