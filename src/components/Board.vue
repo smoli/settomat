@@ -1,5 +1,5 @@
 <template>
-    <div class="info">
+    <div class="info" v-if="!gameEnded">
         <span id="timer">Timer: {{ timer }}</span><br/>
         <button class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Kein Set
         </button>
@@ -23,9 +23,13 @@
                       :error="c.error"
                       :tip="aSet.indexOf(c) !== -1"
 
+                      :width="cardWidth"
+                      :height="cardHeight"
+
                       @clicked="onCardSelected(c)"
                 ></Card>
-                <Card v-else :back="true"></Card>
+                <Card v-else :back="true" :width="cardWidth"
+                      :height="cardHeight"></Card>
             </div>
         </div>
 
@@ -41,7 +45,30 @@
     <div v-if="gameEnded">
         <h1>Fertig</h1>
         <p>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</p>
-        <button @click="reset">Noch mal!</button>
+        <button class="button" @click="reset">Noch mal!</button>
+        <h2>Deine Sets</h2>
+        <div v-for="set of sets">
+            <div class="board" style="grid-template-columns: 1fr 1fr 1fr">
+                <div v-for="c of set">
+                    <Card
+                          :shape="c.shape"
+                          :color="c.color"
+                          :filling="c.filling"
+                          :count="c.count"
+                          :selected="c.selected"
+                          :error="c.error"
+                          :tip="aSet.indexOf(c) !== -1"
+
+                          :width="cardWidth"
+                          :height="cardHeight"
+
+                          @clicked="onCardSelected(c)"
+                    ></Card>
+                </div>
+            </div>
+
+
+        </div>
     </div>
 </template>
 
@@ -52,11 +79,13 @@ import {ICard} from "../ICard.ts";
 import {checkForSet, createDeck, createReducedDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
 import {createEmptyBoard, fillBoard, growBoard, rearrangeBoard} from "../boardFunctions.ts";
 
+const timerDefault = 120;
 
 const boardSize = ref(0);
 const setsFound = ref(0);
 const timer = ref(120);
 const points = ref(0);
+const sets = ref<ICard[][]>([]);
 const boardCards = ref<(ICard | boolean)[]>([]);
 
 
@@ -80,14 +109,24 @@ function resetDeck() {
 }
 
 const boardColumns = computed(() => {
+    return Array.from(Array(boardSize.value / 3).keys()).map(() => "1fr").join(" ");
+});
 
-    if (window.innerWidth <= 600) {
-        return "1fr 1fr 1fr 1fr";
-    } else {
-        return Array.from(Array(boardSize.value / 3).keys()).map(() => "1fr").join(" ");
+const cardWidth = computed(() => {
+    if (window.innerWidth < 600) {
+        return (88 / (boardSize.value / 3)) + "vw";
     }
 
+    return "12vh";
 });
+
+const cardHeight = computed(() => {
+    if (window.innerWidth < 600) {
+        return ((10 / 6) * (88 / (boardSize.value / 3))) + "vw";
+    }
+
+    return "20vh";
+})
 
 
 function shuffleDeck() {
@@ -110,8 +149,9 @@ function onCardSelected(c: ICard) {
     if (selection.value.length === 3) {
         if (isSet(selection.value[0], selection.value[1], selection.value[2])) {
             setsFound.value += 1;
-            points.value += timer.value;
+            rewardPoints();
             timer.value = 120;
+            sets.value.push([selection.value[0], selection.value[1], selection.value[2]]);
             removeCardsFromBoard(selection.value);
             shrink(12);
             fill();
@@ -142,6 +182,10 @@ function deselectAll() {
         }
     });
     selection.value = [];
+}
+
+function rewardPoints() {
+    points.value += timer.value;
 }
 
 function deductPoints(amount: number) {
@@ -180,11 +224,10 @@ function fill() {
 
 }
 
-
 let interval: number = -1;
 
 function startTimer() {
-    timer.value = 120;
+    timer.value = timerDefault;
     interval = setInterval(() => {
         if (timer.value > 1) {
             timer.value -= 1;
@@ -196,6 +239,9 @@ function stopTimer() {
     clearInterval(interval);
 }
 
+function resetTimer() {
+    timer.value = timerDefault;
+}
 
 const hasASet = computed(() => {
     return checkForSet(boardCards.value.filter(c => typeof c !== "boolean") as ICard[]);
@@ -233,7 +279,7 @@ function clearBoard() {
 const wrongSayingNoSet = ref(false);
 
 function userSaysNoSet() {
-    if (!hasASet.value) {
+    if (hasASet.value) {
 
         deductPoints(timer.value);
 
@@ -243,6 +289,8 @@ function userSaysNoSet() {
         }, 1000);
 
     } else {
+        rewardPoints();
+        resetTimer();
         grow();
     }
 }
@@ -284,7 +332,7 @@ function reset() {
     stopTimer();
     boardSize.value = 12;
     resetDeck();
-    shuffleDeck();
+    // shuffleDeck();
     clearBoard();
     fill();
     startTimer();
@@ -316,11 +364,12 @@ span {
 @media (max-width: 600px) {
     #timer, #setCount, #points, #deckSize {
         font-size: 1em;
-}
+    }
 }
 
 .button {
     margin: 0.5em;
+    font-size: 1em;
 }
 
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="card" :class="{ selected: selected, error: error }" @click="onClicked()">
+    <div class="card" :class="{ selected: selected, error: error }" @click="onClicked()" :style="{ width: props.width, height: props.height }">
         <svg v-if="!back" class="render" viewBox="-300 -500 600 1000">
 
             <g transform="translate(-200, -450) scale(10, 10) rotate(45)" v-if="tip">
@@ -37,7 +37,9 @@ const props = defineProps<{
     selected?: boolean,
     error?: boolean,
     back?: boolean,
-    tip?: boolean
+    tip?: boolean,
+    width: string,
+    height: string
 }>();
 
 const emits = defineEmits(["clicked"]);

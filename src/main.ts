@@ -5,7 +5,7 @@ import App from './App.vue'
 
 import Board from "./components/Board.vue";
 import Menu from "./components/Menu.vue";
-import {createMemoryHistory, createRouter, createWebHashHistory} from "vue-router";
+import {createRouter, createWebHashHistory} from "vue-router";
 
 const routes = [
     { path: "/", component: Menu},
