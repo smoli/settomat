@@ -44,7 +44,7 @@
     </div>
     <div v-if="gameEnded">
         <h1>Fertig</h1>
-        <p>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</p>
+        <h2>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</h2>
         <button class="button" @click="reset">Noch mal!</button>
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
@@ -55,14 +55,12 @@
                           :color="c.color"
                           :filling="c.filling"
                           :count="c.count"
-                          :selected="c.selected"
-                          :error="c.error"
+                          :selected="false"
+                          :error="false"
                           :tip="aSet.indexOf(c) !== -1"
 
                           :width="cardWidth"
                           :height="cardHeight"
-
-                          @clicked="onCardSelected(c)"
                     ></Card>
                 </div>
             </div>
@@ -332,7 +330,7 @@ function reset() {
     stopTimer();
     boardSize.value = 12;
     resetDeck();
-    // shuffleDeck();
+    shuffleDeck();
     clearBoard();
     fill();
     startTimer();

@@ -93,12 +93,12 @@ function onClicked() {
 
 
 .card.selected {
-    border-color: cornflowerblue;
+    border-color: #494949;
     /*box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.3);*/
 }
 
 .card.error {
-    border-color: red;
+    border-color: #ff0000;
 }
 
 .render {
