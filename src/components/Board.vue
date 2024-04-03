@@ -1,10 +1,9 @@
 <template>
     <div class="info" v-if="!gameEnded">
         <span id="timer">Timer: {{ timer }}</span><br/>
-        <button class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Kein Set
+        <button v-if="!forceSet" class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Kein Set
         </button>
-        <!--    <button @click="shrink">Shrink {{ boardSize}}</button>-->
-        <br>
+        <br v-if="!forceSet">
         <span id="setCount">Gefunden: {{ setsFound }}</span>
         <span id="points">Punkte: {{ points }}</span>
         <span id="deckSize">Stapel: {{ deck.length }}</span>
@@ -33,6 +32,7 @@
             </div>
         </div>
 
+        <span id="forceHint" v-if="forceSet">Mindestens ein Set vorhanden</span>
     </div>
     <div v-if="gameEnded">
         <h1>Fertig</h1>
@@ -43,21 +43,19 @@
             <div class="board" style="grid-template-columns: 1fr 1fr 1fr">
                 <div v-for="c of set">
                     <Card
-                          :shape="c.shape"
-                          :color="c.color"
-                          :filling="c.filling"
-                          :count="c.count"
-                          :selected="false"
-                          :error="false"
-                          :tip="aSet.indexOf(c) !== -1"
+                            :shape="c.shape"
+                            :color="c.color"
+                            :filling="c.filling"
+                            :count="c.count"
+                            :selected="false"
+                            :error="false"
+                            :tip="aSet.indexOf(c) !== -1"
 
-                          :width="cardWidth"
-                          :height="cardHeight"
+                            :width="cardWidth"
+                            :height="cardHeight"
                     ></Card>
                 </div>
             </div>
-
-
         </div>
     </div>
     <svg width="1" height="1">
@@ -75,7 +73,14 @@ import Card from "./Card.vue";
 import {computed, ref} from "vue";
 import {ICard} from "../ICard.ts";
 import {checkForSet, createDeck, createReducedDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
-import {createEmptyBoard, fillBoard, growBoard, rearrangeBoard} from "../boardFunctions.ts";
+import {
+    createEmptyBoard,
+    fillBoard, fillEmptySlots,
+    getEmptySlotCount,
+    growBoard,
+    pickCardsFromTop, pickCardsToFormSet,
+    rearrangeBoard, removeCardsFromDeck
+} from "../boardFunctions.ts";
 
 const timerDefault = 120;
 
@@ -87,7 +92,7 @@ const sets = ref<ICard[][]>([]);
 const boardCards = ref<(ICard | boolean)[]>([]);
 
 
-const props = defineProps<{ features: string }>();
+const props = defineProps<{ features: string, guarantee: string }>();
 
 const deck = ref<ICard[]>([]);
 const selection = ref<ICard[]>([]);
@@ -211,15 +216,27 @@ function removeCardsFromBoard(cards: ICard[]) {
 
 
 function fill() {
-    boardCards.value = fillBoard(boardCards.value, deck.value);
+    const empties = getEmptySlotCount(boardCards.value);
+    if (empties > deck.value.length) {
+        return;
+    }
 
-    boardCards.value.forEach(c => {
-        if (typeof c === "boolean") {
-            return;
+    let pick: ICard[];
+
+    if (forceSet.value) {
+        pick = pickCardsToFormSet(boardCards.value, deck.value);
+
+        if (pick.length < empties) {
+            deck.value = removeCardsFromDeck(deck.value, pick);
+            pick = [...pick, ...pickCardsFromTop(deck.value, empties - pick.length)]
         }
-        console.log(c.shape, c.filling, c.color, c.count);
-    });
 
+    } else {
+        pick = pickCardsFromTop(deck.value, empties);
+    }
+
+    boardCards.value = fillEmptySlots(boardCards.value, pick);
+    deck.value = removeCardsFromDeck(deck.value, pick);
 }
 
 let interval: number = -1;
@@ -240,6 +257,11 @@ function stopTimer() {
 function resetTimer() {
     timer.value = timerDefault;
 }
+
+
+const forceSet = computed(() => {
+    return props.guarantee === "on";
+})
 
 const hasASet = computed(() => {
     return checkForSet(boardCards.value.filter(c => typeof c !== "boolean") as ICard[]);
@@ -313,10 +335,22 @@ const aSet = computed(() => {
 
 const gameEnded = computed(() => {
     if (hasASet.value) {
+        // If we still have a set, game continues
         return false;
     }
 
+    if (forceSet.value) {
+        // If we try to guarantee a set and there is none, game ends
+        return true;
+    }
+
     if (deck.value.length > 0) {
+        // If there are still cards on the deck, game continues if we can create a set with cards from the deck.
+        const pick = pickCardsToFormSet(boardCards.value, deck.value);
+
+        if (pick.length === 0) {
+            return true;
+        }
         return false;
     }
 
@@ -352,7 +386,7 @@ span {
     background-color: red;
 }
 
-#timer, #setCount, #points, #deckSize {
+#timer, #setCount, #points, #deckSize, #forceHint {
     display: inline-block;
     font-size: 1.5em;
     font-weight: bold;

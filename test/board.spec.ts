@@ -1,29 +1,27 @@
 import {describe, expect, test} from "vitest";
-import {createEmptyBoard, fillBoard, growBoard, rearrangeArray, rearrangeBoard} from "../src/boardFunctions";
-import {createDeck, createReducedDeck} from "../src/deckFunctions";
+import {
+    createEmptyBoard,
+    fillEmptySlots, getEmptySlotCount,
+    growBoard, pickCardsFromBottom, pickCardsFromTop, pickCardsToFormSet,
+    rearrangeArray,
+    rearrangeBoard,
+    removeCardsFromDeck
+} from "../src/boardFunctions";
+import {checkForSet, createDeck, createReducedDeck} from "../src/deckFunctions";
+import {ICard} from "../src/ICard";
 
 describe("board", () => {
     test("create an empty board", () => {
         expect(createEmptyBoard(12)).to.deep.eq([false, false, false, false, false, false, false, false, false, false, false, false])
     });
 
-    test("filling from deck", () => {
-        const d = createDeck(12);
-        let b = createEmptyBoard(4);
 
-        b = fillBoard(b, d);
-
-        expect(b[0]).to.not.eq(false);
-        expect(b[1]).to.not.eq(false);
-        expect(b[2]).to.not.eq(false);
-        expect(b[3]).to.not.eq(false);
-    });
 
     test("grow", () => {
         const d = createDeck(12);
         let b = createEmptyBoard(4);
 
-        b = fillBoard(b, d);
+        b = fillEmptySlots(b, pickCardsFromTop(d, 4));
 
         b = growBoard(b, 3);
 
@@ -37,7 +35,7 @@ describe("board", () => {
         const d = createDeck(12);
         let b = createEmptyBoard(6);
 
-        b = fillBoard(b, d);
+        b = fillEmptySlots(b, pickCardsFromTop(d, 6));
 
         const b2 = [...b];
 
@@ -69,6 +67,23 @@ describe("board", () => {
         expect(d.length).to.eq(81);
     });
 
+    test("removing cards from deck", () => {
+       const d = createDeck();
+        const c1: ICard = {
+            shape: 1,
+            color: 1,
+            filling: 1,
+            count: 1,
+        }
+
+        const d2 = removeCardsFromDeck(d, [c1]);
+
+        expect(d2.length).to.eq(d.length - 1);
+
+        const d3 = removeCardsFromDeck(d2, [c1]);
+        expect(d3.length).to.eq(d2.length);
+    });
+
     test("creating a deck with 3 features", () => {
         let d = createReducedDeck({ color: null, shape: null, filling: null, count: 1 });
         expect(d.length).to.eq(27);
@@ -82,4 +97,138 @@ describe("board", () => {
         expect(d.length).to.eq(27);
         d.forEach(c => expect(c.shape).to.eq(2));
     });
+
+    test("picking cards from top of deck", () => {
+        const c1: ICard = {
+            shape: 0,
+            color: 0,
+            filling: 0,
+            count: 1,
+        }
+
+        const c2: ICard = {
+            shape: 1,
+            color: 0,
+            filling: 0,
+            count: 1,
+        }
+
+        const c3: ICard = {
+            shape: 2,
+            color: 0,
+            filling: 0,
+            count: 1,
+        }
+
+        const c4: ICard = {
+            shape: 0,
+            color: 1,
+            filling: 0,
+            count: 1,
+        }
+
+        const c5: ICard = {
+            shape: 1,
+            color: 1,
+            filling: 0,
+            count: 1,
+        }
+
+        const c6: ICard = {
+            shape: 2,
+            color: 1,
+            filling: 0,
+            count: 1,
+        }
+
+        const d = [c1, c2, c3, c4, c5, c6];
+        const p = pickCardsFromTop(d, 2);
+
+        expect(p).to.deep.eq([c1, c2]);
+    });
+
+
+    test("filling a board with guaranteed sets", () => {
+        const c1: ICard = {
+            shape: 0,
+            color: 0,
+            filling: 0,
+            count: 1,
+        }
+
+        const c2: ICard = {
+            shape: 1,
+            color: 0,
+            filling: 0,
+            count: 1,
+        }
+
+        const c3: ICard = {
+            shape: 2,
+            color: 0,
+            filling: 0,
+            count: 1,
+        }
+
+        const c4: ICard = {
+            shape: 0,
+            color: 1,
+            filling: 0,
+            count: 1,
+        }
+
+        const c5: ICard = {
+            shape: 1,
+            color: 1,
+            filling: 0,
+            count: 1,
+        }
+
+        const c6: ICard = {
+            shape: 2,
+            color: 1,
+            filling: 0,
+            count: 1,
+        }
+
+        let board = [c1, c2, false, c4];
+        let deck = [c5, c3, c6];
+
+        const pick = pickCardsFromTop(deck, 1);
+
+        const b2 = fillEmptySlots(board, pick);
+        deck = removeCardsFromDeck(deck, pick);
+
+        expect(checkForSet(b2 as ICard[])).to.eq(false);
+
+        deck = [c5, c3, c6]
+
+        const pick2 = pickCardsToFormSet(board, deck);
+
+        console.log("PICK2", pick2);
+
+        const b3 = fillEmptySlots(board, pick2);
+
+        console.log(b3);
+        expect(checkForSet(b3 as ICard[])).to.eq(true);
+
+    });
+
+
+    test("filling from deck", () => {
+        let d = createDeck(12);
+        let b = createEmptyBoard(4);
+
+        const l = getEmptySlotCount(b);
+        const p = pickCardsFromTop(d, l);
+
+        b = fillEmptySlots(b, p);
+
+        d = removeCardsFromDeck(d, p);
+
+        expect(b[0]).to.not.eq(false);
+        expect(b[1]).to.not.eq(false);
+        expect(b[2]).to.not.eq(false);
+        expect(b[3]).to.not.eq(false);
+    })
 });

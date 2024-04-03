@@ -35,20 +35,20 @@ export function createReducedDeck(features: IFeatrues): ICard[] {
     return createDeck().filter(c => {
         let r = true;
 
-       if (typeof features.count === "number") {
-           r = r && (c.count === features.count)
-       }
-       if (typeof features.shape === "number") {
-           r = r && (c.shape === features.shape)
-       }
-       if (typeof features.color === "number") {
-           r = r && (c.color === features.color)
-       }
-       if (typeof features.filling === "number") {
-           r = r && (c.filling === features.filling)
-       }
+        if (typeof features.count === "number") {
+            r = r && (c.count === features.count)
+        }
+        if (typeof features.shape === "number") {
+            r = r && (c.shape === features.shape)
+        }
+        if (typeof features.color === "number") {
+            r = r && (c.color === features.color)
+        }
+        if (typeof features.filling === "number") {
+            r = r && (c.filling === features.filling)
+        }
 
-       return r;
+        return r;
     });
 }
 
@@ -69,12 +69,47 @@ export function sameOrDifferent(v1: number, v2: number, v3: number): boolean {
     return false;
 }
 
-export function isSet(c1: ICard, c2: ICard, c3: ICard): boolean {
 
+export function isSet(c1: ICard, c2: ICard, c3: ICard): boolean {
     return sameOrDifferent(c1.shape, c2.shape, c3.shape) &&
         sameOrDifferent(c1.color, c2.color, c3.color) &&
         sameOrDifferent(c1.filling, c2.filling, c3.filling) &&
         sameOrDifferent(c1.count, c2.count, c3.count);
+}
+
+
+export function getMissing(c1: ICard, c2: ICard): ICard {
+    let color: number;
+    let shape: number;
+    let filling: number;
+    let count: number;
+
+    if (c1.color === c2.color) {
+        color = c1.color
+    } else {
+        color = 3 - c1.color - c2.color;
+    }
+
+    if (c1.shape === c2.shape) {
+        shape = c1.shape
+    } else {
+        shape = 3 - c1.shape - c2.shape;
+    }
+
+    if (c1.filling === c2.filling) {
+        filling = c1.filling
+    } else {
+        filling = 3 - c1.filling - c2.filling;
+    }
+
+    if (c1.count === c2.count) {
+        count = c1.count
+    } else {
+        count = 6 - c1.count - c2.count;
+    }
+
+    return {color, count, filling, shape}
+
 }
 
 export function checkForSet(cards: ICard[]): boolean {
