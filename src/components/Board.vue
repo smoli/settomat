@@ -38,6 +38,7 @@
         <h1>Fertig</h1>
         <h2>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</h2>
         <button class="button" @click="reset">Noch mal!</button>
+        <router-link class="button" to="/">Zum Menü</router-link>
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
             <div class="board" style="grid-template-columns: 1fr 1fr 1fr">
