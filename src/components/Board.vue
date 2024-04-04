@@ -76,7 +76,7 @@ import {ICard} from "../ICard.ts";
 import {checkForSet, createDeck, createReducedDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
 import {
     createEmptyBoard,
-    fillBoard, fillEmptySlots,
+    fillEmptySlots,
     getEmptySlotCount,
     growBoard,
     pickCardsFromTop, pickCardsToFormSet,
