@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <span id="forceHint" v-if="forceSet">Mindestens ein Set vorhanden</span>
+        <span id="forceHint" v-if="forceSet">Es gibt mindestens ein Set</span>
     </div>
     <div v-if="gameEnded">
         <h1>Fertig</h1>
