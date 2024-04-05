@@ -1,7 +1,8 @@
 <template>
     <div class="info" v-if="!gameEnded">
         <span id="timer">Timer: {{ timer }}</span><br/>
-        <button v-if="!forceSet" class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">Kein Set
+        <button v-if="!forceSet" class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">
+            Kein Set
         </button>
         <br v-if="!forceSet">
         <span id="setCount">Gefunden: {{ setsFound }}</span>
@@ -35,9 +36,18 @@
         <span id="forceHint" v-if="forceSet">Es gibt mindestens ein Set</span>
     </div>
     <div v-if="gameEnded">
-        <h1>Fertig</h1>
+        <h1>Geschafft!</h1>
         <h2>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</h2>
-        <button class="button" @click="reset">Noch mal!</button>
+
+        <div class="game-url">
+        <h2>Verschicke diesen Link und andere können diese Kartenreihenfolge auch spielen</h2>
+        <button class="button game-url" @click="copyGameLink()">
+            <img alt="Copy SVG Vector Icon" height="20pt" decoding="async" data-nimg="1" style="color:transparent;" src="../assets/copy.svg">
+            <span>{{ gameLink }}</span></button>
+        </div>
+
+
+        <button class="button" @click="reset(true)">Noch mal!</button>
         <router-link class="button" to="/">Zum Menü</router-link>
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
@@ -91,9 +101,9 @@ const timer = ref(120);
 const points = ref(0);
 const sets = ref<ICard[][]>([]);
 const boardCards = ref<(ICard | boolean)[]>([]);
+const seedUsed = ref(-1);
 
-
-const props = defineProps<{ features: string, guarantee: string }>();
+const props = defineProps<{ features: string, guarantee: string, seed: string }>();
 
 const deck = ref<ICard[]>([]);
 const selection = ref<ICard[]>([]);
@@ -133,8 +143,12 @@ const cardHeight = computed(() => {
 })
 
 
-function shuffleDeck() {
-    shuffle(deck.value);
+function shuffleDeck(force: boolean = false) {
+    if (props.seed && !force) {
+        seedUsed.value = shuffle(deck.value, Number(props.seed));
+    } else {
+        seedUsed.value = shuffle(deck.value);
+    }
 }
 
 function onCardSelected(c: ICard) {
@@ -358,14 +372,26 @@ const gameEnded = computed(() => {
     return true;
 });
 
-function reset() {
+const gameLink = computed(() => {
+    return window.location.protocol + "//" + window.location.host + "/#/play/" + props.features + (forceSet.value ? "/on" : "") + "/d/" + seedUsed.value;
+});
+
+async function copyGameLink() {
+    const type = "text/plain";
+    const blob = new Blob([gameLink.value], {type});
+    const data = [new ClipboardItem({[type]: blob})];
+    await navigator.clipboard.write(data);
+}
+
+
+function reset(force: boolean = false) {
     points.value = 0;
     setsFound.value = 0;
 
     stopTimer();
     boardSize.value = 12;
     resetDeck();
-    shuffleDeck();
+    shuffleDeck(force);
     clearBoard();
     fill();
     startTimer();
@@ -404,6 +430,32 @@ span {
     margin: 0.5em;
     font-size: 1em;
 }
+
+.button:active {
+    border-color: cornflowerblue;
+}
+
+.button.game-url {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1em;
+}
+
+button.game-url span {
+    pointer-events: all !important;
+}
+
+div.game-url {
+    display: flex; justify-content: center; flex-direction: column;
+    margin-bottom: 1em;
+}
+
+div.game-url h2 {
+    margin: 0;
+}
+
 
 
 </style>

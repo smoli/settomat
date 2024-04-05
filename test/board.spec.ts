@@ -7,7 +7,7 @@ import {
     rearrangeBoard,
     removeCardsFromDeck
 } from "../src/boardFunctions";
-import {checkForSet, createDeck, createReducedDeck} from "../src/deckFunctions";
+import {checkForSet, createDeck, createReducedDeck, shuffle} from "../src/deckFunctions";
 import {ICard} from "../src/ICard";
 
 describe("board", () => {
@@ -230,5 +230,53 @@ describe("board", () => {
         expect(b[1]).to.not.eq(false);
         expect(b[2]).to.not.eq(false);
         expect(b[3]).to.not.eq(false);
-    })
+    });
+
+    test("shuffling with a different seed will always produce the different decks", () => {
+
+        const seed = 12;
+        let d1 = createDeck();
+        let d2 = createDeck();
+
+        shuffle(d1, seed);
+        shuffle(d2, seed * 2);
+
+        expect(d1).to.not.deep.eq(d2);
+    });
+
+    test("shuffling without a seed will always produce the different decks", () => {
+
+        let d1 = createDeck();
+        let d2 = createDeck();
+
+        shuffle(d1);
+        shuffle(d2);
+
+        expect(d1).to.not.deep.eq(d2);
+
+        // test to first use a seed and then not
+
+        shuffle(d1, 12);
+
+        d1 = createDeck();
+        d2 = createDeck();
+
+        shuffle(d1);
+        shuffle(d2);
+
+        expect(d1).to.not.deep.eq(d2);
+    });
+
+
+    test("shuffling with the same seed will allways produce the same deck", () => {
+
+        const seed = 12;
+        let d1 = createDeck();
+        let d2 = createDeck();
+
+        shuffle(d1, seed);
+        shuffle(d2, seed);
+
+        expect(d1).to.deep.eq(d2);
+    });
 });

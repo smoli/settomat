@@ -57,10 +57,20 @@ export function createReducedDeck(features: IFeatrues): ICard[] {
     });
 }
 
-export function shuffle(deck: ICard[]) {
+export function shuffle(deck: ICard[], seed: number = -1) {
+
+    let lSeed = seed;
+
+    if (seed === -1) {
+        lSeed = generator.int();
+    }
+    generator.seed(lSeed);
+
     deck.sort(() => 0.5 - generator.random());
     deck.sort(() => 0.5 - generator.random());
     deck.sort(() => 0.5 - generator.random());
+
+    return lSeed;
 }
 
 

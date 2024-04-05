@@ -8,7 +8,9 @@ import Menu from "./components/Menu.vue";
 import {createRouter, createWebHashHistory} from "vue-router";
 
 const routes = [
+    { path: "/play/:features/:guarantee/d/:seed", component: Board, props: true },
     { path: "/play/:features/:guarantee", component: Board, props: true },
+    { path: "/play/:features/d/:seed", component: Board, props: true },
     { path: "/play/:features", component: Board, props: true },
     { path: "/", component: Menu},
 
