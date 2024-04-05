@@ -69,10 +69,6 @@ export function pickCardsFromBottom(deck: ICard[], count: number): ICard[] {
 
 export function getMissingCard(c1: ICard, c2: ICard, otherCards: ICard[]): number {
     const m = getMissing(c1, c2);
-    console.log("Looking for", m)
-    console.log("  to Complement", c1)
-    console.log("            and", c2)
-    console.log("             in", otherCards)
     return otherCards.findIndex(r => r.color === m.color && r.count === m.count && r.shape === m.shape && r.filling === m.filling);
 }
 
@@ -108,9 +104,6 @@ export function pickCardsToFormSet(board: Board, deck: ICard[]): ICard[] {
     const cards: ICard[] = board.filter(c => typeof c !== "boolean") as ICard[];
 
     let set = pickMissing(cards, deck);
-
-    console.log("Set1", set);
-
 
     if (!set.length) {
         set = pickMissing(deck, cards);

@@ -1,4 +1,9 @@
 import {ICard} from "./ICard.ts";
+// @ts-ignore
+import MT from "mersennetwister"
+
+
+const generator = new MT();
 
 export interface IFeatrues {
     color: null | 0 | 1 | 2;
@@ -53,7 +58,9 @@ export function createReducedDeck(features: IFeatrues): ICard[] {
 }
 
 export function shuffle(deck: ICard[]) {
-    deck.sort(() => 0.5 - Math.random());
+    deck.sort(() => 0.5 - generator.random());
+    deck.sort(() => 0.5 - generator.random());
+    deck.sort(() => 0.5 - generator.random());
 }
 
 
