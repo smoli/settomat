@@ -1,4 +1,5 @@
 <template>
+    <div v-if="testMode"><h1>TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE</h1></div>
     <div class="info" v-if="!gameEnded">
         <span id="timer">Timer: {{ timer }}</span><br/>
         <button v-if="!forceSet" class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">
@@ -39,12 +40,13 @@
         <h1>Geschafft!</h1>
         <h2>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</h2>
 
-        <div class="game-url">
-        <h2>Verschicke diesen Link und andere können diese Kartenreihenfolge auch spielen</h2>
-        <button class="button game-url" @click="copyGameLink()">
-            <img alt="Copy SVG Vector Icon" height="20pt" decoding="async" data-nimg="1" style="color:transparent;" src="../assets/copy.svg">
-            <span>{{ gameLink }}</span></button>
-        </div>
+<!--        <div class="game-url">
+            <h2>Verschicke diesen Link und andere können diese Kartenreihenfolge auch spielen</h2>
+            <button class="button game-url" @click="copyGameLink()">
+                <img alt="Copy SVG Vector Icon" height="20pt" decoding="async" data-nimg="1" style="color:transparent;"
+                     src="../assets/copy.svg">
+                <span>{{ gameLink }}</span></button>
+        </div>-->
 
 
         <button class="button" @click="reset(true)">Noch mal!</button>
@@ -90,8 +92,9 @@ import {
     getEmptySlotCount,
     growBoard,
     pickCardsFromTop, pickCardsToFormSet,
-    rearrangeBoard, removeCardsFromDeck
+    rearrangeBoard, removeCardsFromBoard, removeCardsFromDeck
 } from "../boardFunctions.ts";
+
 
 const timerDefault = 120;
 
@@ -102,6 +105,8 @@ const points = ref(0);
 const sets = ref<ICard[][]>([]);
 const boardCards = ref<(ICard | boolean)[]>([]);
 const seedUsed = ref(-1);
+const testMode = ref(true);
+
 
 const props = defineProps<{ features: string, guarantee: string, seed: string }>();
 
@@ -145,7 +150,7 @@ const cardHeight = computed(() => {
 
 function shuffleDeck(force: boolean = false) {
     if (props.seed && !force) {
-        seedUsed.value = shuffle(deck.value, Number(props.seed));
+        seedUsed.value = shuffle(deck.value, Number(props.seed), true);
     } else {
         seedUsed.value = shuffle(deck.value);
     }
@@ -170,10 +175,11 @@ function onCardSelected(c: ICard) {
             rewardPoints();
             timer.value = 120;
             sets.value.push([selection.value[0], selection.value[1], selection.value[2]]);
-            removeCardsFromBoard(selection.value);
+            removeCards(selection.value);
             shrink(12);
             fill();
             selection.value = []
+            lastSetFound = []
         } else {
             deductPoints(timer.value);
 
@@ -210,23 +216,9 @@ function deductPoints(amount: number) {
     points.value = Math.max(points.value - amount, 0);
 }
 
-function removeCardsFromBoard(cards: ICard[]) {
-
-    boardCards.value = boardCards.value.map(c => {
-
-        if (typeof c === "boolean") {
-            return c;
-        }
-
-        if (cards.indexOf(c) !== -1) {
-            return false;
-        } else {
-            return c;
-        }
-    })
-
-    deck.value = deck.value.filter(a => cards.indexOf(a) === -1);
-    console.log(deck.value.length);
+function removeCards(cards: ICard[]) {
+    boardCards.value = removeCardsFromBoard(boardCards.value, cards)
+    deck.value = removeCardsFromDeck(deck.value, cards);
 }
 
 
@@ -239,12 +231,14 @@ function fill() {
     let pick: ICard[];
 
     if (forceSet.value) {
-        pick = pickCardsToFormSet(boardCards.value, deck.value);
+        pick = pickCardsToFormSet(boardCards.value, deck.value, seedUsed.value);
 
         if (pick.length < empties) {
             deck.value = removeCardsFromDeck(deck.value, pick);
             pick = [...pick, ...pickCardsFromTop(deck.value, empties - pick.length)]
         }
+
+        shuffle(pick, seedUsed.value);
 
     } else {
         pick = pickCardsFromTop(deck.value, empties);
@@ -254,7 +248,7 @@ function fill() {
     deck.value = removeCardsFromDeck(deck.value, pick);
 }
 
-let interval: number = -1;
+let interval: (number | NodeJS.Timeout) = -1;
 
 function startTimer() {
     timer.value = timerDefault;
@@ -330,13 +324,25 @@ function userSaysNoSet() {
     }
 }
 
+let lastSetFound = [];
+
 
 const aSet = computed(() => {
-    if (timer.value > 20) {
-        return [];
+    if (timer.value > 20 && !testMode.value) {
+        lastSetFound = [];
+        return lastSetFound;
+    }
+
+    if (lastSetFound.length) {
+        return lastSetFound;
     }
 
     const r = getASet(boardCards.value.filter(c => typeof c !== "boolean") as ICard[]);
+
+    if (testMode.value) {
+    lastSetFound = r;
+        return r;
+    }
 
     r.pop();
 
@@ -344,6 +350,8 @@ const aSet = computed(() => {
         r.pop();
     }
 
+
+    lastSetFound = r;
 
     return r;
 })
@@ -361,7 +369,7 @@ const gameEnded = computed(() => {
 
     if (deck.value.length > 0) {
         // If there are still cards on the deck, game continues if we can create a set with cards from the deck.
-        const pick = pickCardsToFormSet(boardCards.value, deck.value);
+        const pick = pickCardsToFormSet(boardCards.value, deck.value, seedUsed.value);
 
         if (pick.length === 0) {
             return true;
@@ -387,6 +395,7 @@ async function copyGameLink() {
 function reset(force: boolean = false) {
     points.value = 0;
     setsFound.value = 0;
+    lastSetFound = [];
 
     stopTimer();
     boardSize.value = 12;
@@ -448,14 +457,15 @@ button.game-url span {
 }
 
 div.game-url {
-    display: flex; justify-content: center; flex-direction: column;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
     margin-bottom: 1em;
 }
 
 div.game-url h2 {
     margin: 0;
 }
-
 
 
 </style>

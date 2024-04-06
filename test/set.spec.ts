@@ -1,6 +1,6 @@
 import {describe, expect, test} from "vitest";
 import {ICard} from "../src/ICard";
-import {checkForSet, getMissing, isSet, sameOrDifferent} from "../src/deckFunctions";
+import {checkForSet, getASet, getMissing, isSet, sameOrDifferent} from "../src/deckFunctions";
 
 describe("sets", () => {
 
@@ -82,13 +82,17 @@ describe("sets", () => {
             shape: 3,
             color: 1,
             filling: 1,
-            count: 1,
+            count: 2,
         }
 
 
         expect(checkForSet([c1, c2, c3, c4, c5, c6])).to.eq(true);
         expect(checkForSet([c1, c4, c5, c6])).to.eq(false);
 
+        const s = getASet([c1, c2, c3, c4, c5, c6]);
+        expect(s).to.contain(c1);
+        expect(s).to.contain(c2);
+        expect(s).to.contain(c3);
     });
 
     test("Finding the missing card", () => {

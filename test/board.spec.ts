@@ -7,14 +7,13 @@ import {
     rearrangeBoard,
     removeCardsFromDeck
 } from "../src/boardFunctions";
-import {checkForSet, createDeck, createReducedDeck, shuffle} from "../src/deckFunctions";
+import {checkForSet, createDeck, createReducedDeck, getASet, shuffle} from "../src/deckFunctions";
 import {ICard} from "../src/ICard";
 
 describe("board", () => {
     test("create an empty board", () => {
         expect(createEmptyBoard(12)).to.deep.eq([false, false, false, false, false, false, false, false, false, false, false, false])
     });
-
 
 
     test("grow", () => {
@@ -68,7 +67,7 @@ describe("board", () => {
     });
 
     test("removing cards from deck", () => {
-       const d = createDeck();
+        const d = createDeck();
         const c1: ICard = {
             shape: 1,
             color: 1,
@@ -85,15 +84,15 @@ describe("board", () => {
     });
 
     test("creating a deck with 3 features", () => {
-        let d = createReducedDeck({ color: null, shape: null, filling: null, count: 1 });
+        let d = createReducedDeck({color: null, shape: null, filling: null, count: 1});
         expect(d.length).to.eq(27);
         d.forEach(c => expect(c.count).to.eq(1));
 
-        d = createReducedDeck({ color: 0, shape: null, filling: null, count: null });
+        d = createReducedDeck({color: 0, shape: null, filling: null, count: null});
         expect(d.length).to.eq(27);
         d.forEach(c => expect(c.color).to.eq(0));
 
-        d = createReducedDeck({ color: null, shape: 2, filling: null, count: null });
+        d = createReducedDeck({color: null, shape: 2, filling: null, count: null});
         expect(d.length).to.eq(27);
         d.forEach(c => expect(c.shape).to.eq(2));
     });
@@ -203,7 +202,7 @@ describe("board", () => {
 
         deck = [c5, c3, c6]
 
-        const pick2 = pickCardsToFormSet(board, deck);
+        const pick2 = pickCardsToFormSet(board, deck, 12);
 
         console.log("PICK2", pick2);
 
@@ -268,15 +267,20 @@ describe("board", () => {
     });
 
 
-    test("shuffling with the same seed will allways produce the same deck", () => {
+    test("shuffling with the same seed will always produce the same deck", () => {
 
         const seed = 12;
         let d1 = createDeck();
         let d2 = createDeck();
 
         shuffle(d1, seed);
-        shuffle(d2, seed);
+        shuffle(d2, seed, true);
 
         expect(d1).to.deep.eq(d2);
+    });
+
+
+    test("theres no significant bias where sets are on the board during a game with guaranteed sets", () => {
+
     });
 });

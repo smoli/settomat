@@ -1,5 +1,5 @@
 import {ICard} from "./ICard.ts";
-import {getASet, getMissing} from "./deckFunctions.ts";
+import {getASet, getMissing, shuffle} from "./deckFunctions.ts";
 
 
 type Board = (ICard | boolean)[];
@@ -40,6 +40,19 @@ export function removeCardsFromDeck(deck: ICard[], cards: ICard[]) {
     return deck.filter(c => cards.findIndex(r => c.shape === r.shape && c.color === r.color && c.filling === r.filling && c.count === r.count) === -1);
 }
 
+export function removeCardsFromBoard(board: Board, cards: ICard[]): Board {
+    return board.map(c => {
+        if (typeof c === "boolean") {
+            return c;
+        }
+
+        if (cards.indexOf(c) !== -1) {
+            return false;
+        } else {
+            return c;
+        }
+    })
+}
 
 export function pickCardsFromTop(deck: ICard[], count: number): ICard[] {
     if (deck.length < count) {
@@ -99,9 +112,17 @@ function pickMissing(cards1: ICard[], cards2: ICard[]): ICard[] {
     return pick;
 }
 
-export function pickCardsToFormSet(board: Board, deck: ICard[]): ICard[] {
+export function pickCardsToFormSet(board: Board, deck: ICard[], seed:number): ICard[] {
     const empties = getEmptySlotCount(board);
     const cards: ICard[] = board.filter(c => typeof c !== "boolean") as ICard[];
+
+    if (getASet(cards).length === 3) {
+        return [];
+    }
+
+
+    // Shuffling here should reduce the top left bias of sets when laying out the board
+    shuffle(cards, seed);
 
     let set = pickMissing(cards, deck);
 

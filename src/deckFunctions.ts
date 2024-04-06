@@ -57,18 +57,36 @@ export function createReducedDeck(features: IFeatrues): ICard[] {
     });
 }
 
-export function shuffle(deck: ICard[], seed: number = -1) {
+let lastSeed = -1;
+
+export function shuffle(deck: ICard[], seed: number = -1, forceSeed: boolean = false) {
 
     let lSeed = seed;
 
-    if (seed === -1) {
+    if (seed === -1 && lastSeed === -1) {
         lSeed = generator.int();
     }
-    generator.seed(lSeed);
 
-    deck.sort(() => 0.5 - generator.random());
-    deck.sort(() => 0.5 - generator.random());
-    deck.sort(() => 0.5 - generator.random());
+    if (lastSeed !== lSeed || forceSeed) {
+        generator.seed(lSeed);
+        lastSeed = lSeed;
+    }
+
+
+    function internal() {
+        const r = [];
+
+        while (deck.length) {
+            const i = Math.floor(generator.random() * deck.length);
+            r.push(deck[i]);
+
+            deck.splice(i, 1);
+        }
+
+        deck.push(...r);
+    }
+
+    internal();
 
     return lSeed;
 }
@@ -152,21 +170,67 @@ export function checkForSet(cards: ICard[]): boolean {
 
 export function getASet(cards: ICard[]): ICard[] {
 
-    for (let c1 of cards) {
-        for (let c2 of cards) {
-            if (c1 === c2) {
-                continue;
-            }
-            for (let c3 of cards) {
-                if (c1 === c3 || c2 === c3) {
-                    continue;
-                }
+    /* const cards1 = [...cards];
+     const cards2 = [...cards];
+     const cards3 = [...cards];
 
-                if (isSet(c1, c2, c3)) {
-                    return [c1, c2, c3];
+     shuffle(cards1);
+     shuffle(cards2);
+     shuffle(cards3);
+
+     for (let c1 of cards1) {
+         for (let c2 of cards2) {
+             if (c1 === c2) {
+                 continue;
+             }
+             for (let c3 of cards3) {
+                 if (c1 === c3 || c2 === c3) {
+                     continue;
+                 }
+
+                 if (isSet(c1, c2, c3)) {
+                     return [c1, c2, c3];
+                 }
+             }
+         }
+     }*/
+
+    const cards1 = [...cards];
+
+    function get(cards: ICard[]) {
+        return cards[Math.floor(generator.random() * cards.length)]
+    }
+
+    function rem(cards: ICard[], c: ICard) {
+        cards.splice(cards.indexOf(c), 1);
+    }
+
+
+    while (cards1.length) {
+        const c1 = get(cards1);
+        const cards2 = [...cards];
+
+        while (cards2.length) {
+            const c2 = get(cards2);
+
+            if (c1 !== c2) {
+                const cards3 = [...cards];
+
+                while (cards3.length) {
+                    const c3 = get(cards3);
+
+                    if (c1 !== c2 && c2 !== c3 && c1 !== c3) {
+                        if (isSet(c1, c2, c3)) {
+                            return [c1, c2, c3]
+                        }
+                    }
+                    rem(cards3, c3);
                 }
             }
+            rem(cards2, c2);
         }
+        rem(cards1, c1);
     }
+
     return [];
 }
