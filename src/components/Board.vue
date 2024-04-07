@@ -72,14 +72,7 @@
             </div>
         </div>
     </div>
-    <svg width="1" height="1">
-        <defs>
-            <pattern id="diaHatch" viewBox="0,0,30,10" width="10%" height="10%" patternTransform="rotate(45)">
-                <line x1="0" y1="0" x2="20" y2="0" stroke-width="25" stroke="white"/>
-            </pattern>
-        </defs>
-
-    </svg>
+    <PatternDef/>
 </template>
 
 <script setup lang="ts">
@@ -103,6 +96,7 @@ import {
     pickCardsFromTop, pickCardsToFormSet,
     rearrangeBoard, removeCardsFromBoard, removeCardsFromDeck
 } from "../boardFunctions.ts";
+import PatternDef from "./PatternDef.vue";
 
 
 const timerDefault = 120;
