@@ -53,7 +53,8 @@
         <router-link class="button" to="/">Zum Menü</router-link>
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
-            <div class="board" style="grid-template-columns: 1fr 1fr 1fr">
+            <div class="board" style="grid-template-columns: 0fr 1fr 1fr 1fr">
+                <div class="setFeatureCount"><span>{{getDifferingFeatureCount(...set)}}</span></div>
                 <div v-for="c of set">
                     <Card
                             :shape="c.shape"
@@ -85,7 +86,15 @@
 import Card from "./Card.vue";
 import {computed, ref} from "vue";
 import {ICard} from "../ICard.ts";
-import {checkForSet, createDeck, createReducedDeck, getASet, isSet, shuffle} from "../deckFunctions.ts";
+import {
+    checkForSet,
+    createDeck,
+    createReducedDeck,
+    getASet,
+    getDifferingFeatureCount,
+    isSet,
+    shuffle
+} from "../deckFunctions.ts";
 import {
     createEmptyBoard,
     fillEmptySlots,
@@ -100,12 +109,12 @@ const timerDefault = 120;
 
 const boardSize = ref(0);
 const setsFound = ref(0);
-const timer = ref(120);
+const timer = ref(timerDefault);
 const points = ref(0);
 const sets = ref<ICard[][]>([]);
 const boardCards = ref<(ICard | boolean)[]>([]);
 const seedUsed = ref(-1);
-const testMode = ref(true);
+const testMode = ref(false);
 
 
 const props = defineProps<{ features: string, guarantee: string, seed: string }>();
@@ -173,7 +182,7 @@ function onCardSelected(c: ICard) {
         if (isSet(selection.value[0], selection.value[1], selection.value[2])) {
             setsFound.value += 1;
             rewardPoints();
-            timer.value = 120;
+            timer.value = timerDefault;
             sets.value.push([selection.value[0], selection.value[1], selection.value[2]]);
             removeCards(selection.value);
             shrink(12);
@@ -327,31 +336,32 @@ function userSaysNoSet() {
 let lastSetFound = [];
 
 
+
+
 const aSet = computed(() => {
     if (timer.value > 20 && !testMode.value) {
         lastSetFound = [];
         return lastSetFound;
     }
 
-    if (lastSetFound.length) {
-        return lastSetFound;
+    let r = [...lastSetFound];
+
+    if (r.length === 0) {
+        lastSetFound = getASet(boardCards.value.filter(c => typeof c !== "boolean") as ICard[]);
+        r = [...lastSetFound];
     }
 
-    const r = getASet(boardCards.value.filter(c => typeof c !== "boolean") as ICard[]);
-
     if (testMode.value) {
-    lastSetFound = r;
         return r;
     }
 
-    r.pop();
-
-    if (timer.value > 10) {
+    if (r.length === 3) {
         r.pop();
     }
 
-
-    lastSetFound = r;
+    if (timer.value > 10 && r.length === 2) {
+        r.pop();
+    }
 
     return r;
 })
@@ -465,6 +475,15 @@ div.game-url {
 
 div.game-url h2 {
     margin: 0;
+}
+
+div.setFeatureCount {
+    margin-left: -3em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    text-align: center;
 }
 
 

@@ -7,7 +7,7 @@
             color: `hsl(${180 + heatMapHues[i]} 100% 50%)`,
             backgroundColor: `hsl(${heatMapHues[i]} 100% 50%)`
             }"
-        ><span>{{ h }} | {{ (h / heatMapData.length * 100).toFixed(1)}} %</span>
+        ><span>{{ h }} | {{ (h / heatMapData.length * 100).toFixed(1) }} %</span>
         </div>
     </div>
 
@@ -65,7 +65,13 @@ const heatMapMinMax = computed((): { min: number, max: number } => {
 });
 
 const heatMapHues = computed(() => {
-    return heatMap.value.map(v => 120 - 120 * (v - heatMapMinMax.value.min) / (heatMapMinMax.value.max - heatMapMinMax.value.min))
+    const total = heatMapData.value.length;
+
+    return heatMap.value.map(count => {
+      const pctDistance = Math.abs(count / total - 0.25) / 0.25 * 2;
+      return Math.min(120 - 120 * pctDistance, 120);
+    })
+//    return heatMap.value.map(v => 120 - 120 * (v - heatMapMinMax.value.min) / (heatMapMinMax.value.max - heatMapMinMax.value.min))
 });
 
 function simulate(id: number) {
@@ -81,12 +87,12 @@ function simulate(id: number) {
         const empties = getEmptySlotCount(b);
         let pick = [];
 
-            pick = pickCardsToFormSet(b, d, seed)
+        pick = pickCardsToFormSet(b, d, seed)
 
-            if (pick.length < empties) {
-                d = removeCardsFromDeck(d, pick);
-                pick = [...pickCardsFromTop(d, empties - pick.length), ...pick]
-            }
+        if (pick.length < empties) {
+            d = removeCardsFromDeck(d, pick);
+            pick = [...pickCardsFromTop(d, empties - pick.length), ...pick]
+        }
 
         b = fillEmptySlots(b, pick);
 
@@ -105,9 +111,13 @@ function simulate(id: number) {
     rounds.value = 0;
     while (getASet(b as ICard[]).length) {
 
-
         rounds.value += 1;
         let s = getASet(b as ICard[]);
+
+        if (s.length !== 3) {
+            console.log("Set incomplete", s);
+            debugger;
+        }
 
 
         const before = [...b];
@@ -133,14 +143,13 @@ function simulate(id: number) {
             id, board: [...before], boardAfter: [...b], deckSize: d.length, setFound: s, pick
         }
         log.value.push(l);
-
     }
 }
 
-let max = 1000;
+let max = 100;
 
 while (max--) {
-    simulate(100 - max);
+    simulate(max);
 }
 
 </script>
