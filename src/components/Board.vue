@@ -155,7 +155,7 @@ function shuffleDeck(force: boolean = false) {
     if (props.seed && !force) {
         seedUsed.value = setSeed(Number(props.seed));
     }
-    shuffle(deck.value, 3);
+    shuffle(deck.value, 1);
 }
 
 function onCardSelected(c: ICard) {

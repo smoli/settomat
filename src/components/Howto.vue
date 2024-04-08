@@ -142,8 +142,8 @@
     <section>
         <h2>Besondere Spielvariante mit garantiertem Set</h2>
         <p>
-            Du kannst auch eine etwas einfacherere Variante spielen in der immer ein Set mit den ausgelegten Karten
-            geformt werden kann.
+            Du kannst auch eine etwas einfacherere Variante spielen in der sich in den ausgelegten Karten immer ein Set
+            befindet.
         </p>
     </section>
 
