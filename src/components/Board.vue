@@ -54,7 +54,7 @@
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
             <div class="board" style="grid-template-columns: 0fr 1fr 1fr 1fr">
-                <div class="setFeatureCount"><span>{{ getDifferingFeatureCount(...set) }}</span></div>
+                <div class="setFeatureCount"><span>{{ getDifferingFeatureCount(set[0], set[1], set[2]) }}</span></div>
                 <div v-for="c of set">
                     <Card
                             :shape="c.shape"
@@ -326,7 +326,7 @@ function userSaysNoSet() {
     }
 }
 
-let lastSetFound = [];
+let lastSetFound:ICard[] = [];
 
 
 const aSet = computed(() => {
@@ -381,6 +381,7 @@ const gameEnded = computed(() => {
     return true;
 });
 
+/*
 const gameLink = computed(() => {
     return window.location.protocol + "//" + window.location.host + "/#/play/" + props.features + (forceSet.value ? "/on" : "") + "/d/" + seedUsed.value;
 });
@@ -391,6 +392,7 @@ async function copyGameLink() {
     const data = [new ClipboardItem({[type]: blob})];
     await navigator.clipboard.write(data);
 }
+*/
 
 
 function reset(force: boolean = false) {
@@ -421,6 +423,8 @@ span {
 
 .wrongSayingNoSet {
     background-color: red;
+    border-color: red;
+    color: white;
 }
 
 .info {

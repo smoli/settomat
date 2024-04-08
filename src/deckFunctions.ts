@@ -1,7 +1,6 @@
 import {ICard} from "./ICard.ts";
 // @ts-ignore
 import MT from "mersennetwister"
-import {it} from "vitest";
 
 
 const generator = new MT();

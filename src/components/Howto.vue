@@ -45,21 +45,21 @@
         <h2>Beispiele:</h2>
         <div class="cards">
             <Card width="6em" height="10em"
-                  shape="0"
-                  color="0"
-                  filling="0"
+                  :shape="0"
+                  :color="0"
+                  :filling="0"
                   :count="1"
             />
             <Card width="6em" height="10em"
-                  shape="0"
-                  color="0"
-                  filling="0"
+                  :shape="0"
+                  :color="0"
+                  :filling="0"
                   :count="2"
             />
             <Card width="6em" height="10em"
-                  shape="0"
-                  color="0"
-                  filling="0"
+                  :shape="0"
+                  :color="0"
+                  :filling="0"
                   :count="3"
             />
             <p>Dies ist ein Set, da alle Karten dieselbe Form (Pille), dieselbe Farbe (Rot), dieselbe Füllung (leer)
@@ -68,21 +68,21 @@
         </div>
         <div class="cards">
             <Card width="6em" height="10em"
-                  shape="0"
-                  color="0"
-                  filling="0"
+                  :shape="0"
+                  :color="0"
+                  :filling="0"
                   :count="1"
             />
             <Card width="6em" height="10em"
-                  shape="1"
-                  color="0"
-                  filling="0"
+                  :shape="1"
+                  :color="0"
+                  :filling="0"
                   :count="1"
             />
             <Card width="6em" height="10em"
-                  shape="2"
-                  color="0"
-                  filling="0"
+                  :shape="2"
+                  :color="0"
+                  :filling="0"
                   :count="2"
             />
             <p>Dies ist kein Set, da alle Karten zwar die gleiche Farbe und Füllung zeigen, und alle eine
@@ -91,21 +91,21 @@
         </div>
         <div class="cards">
             <Card width="6em" height="10em"
-                  shape="0"
-                  color="0"
-                  filling="0"
+                  :shape="0"
+                  :color="0"
+                  :filling="0"
                   :count="1"
             />
             <Card width="6em" height="10em"
-                  shape="1"
-                  color="1"
-                  filling="1"
+                  :shape="1"
+                  :color="1"
+                  :filling="1"
                   :count="2"
             />
             <Card width="6em" height="10em"
-                  shape="2"
-                  color="2"
-                  filling="2"
+                  :shape="2"
+                  :color="2"
+                  :filling="2"
                   :count="3"
             />
             <p>Dies ist ein Set, da alle Karten in allen Eigenschaften etwas unterschiedliches anzeigen. </p>
@@ -158,9 +158,9 @@
         </p>
         <div class="cards one-card">
             <Card width="6em" height="10em"
-                  shape="2"
-                  color="2"
-                  filling="2"
+                  :shape="2"
+                  :color="2"
+                  :filling="2"
                   :count="3"
                   :tip="true"
             />

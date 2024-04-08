@@ -2,14 +2,14 @@ import {ICard} from "./ICard.ts";
 import {getASet, getMissing, shuffle} from "./deckFunctions.ts";
 
 
-type Board = (ICard | boolean)[];
+export type TBoard = (ICard | boolean)[];
 
-export function createEmptyBoard(size: number): Board {
+export function createEmptyBoard(size: number): TBoard {
     return Array.from(Array(size).keys()).map(() => false);
 }
 
 
-export function growBoard(b: Board, add: number): Board {
+export function growBoard(b: TBoard, add: number): TBoard {
     return [...b, ...Array.from(Array(add).keys()).map(() => false)];
 }
 
@@ -32,7 +32,7 @@ export function rearrangeArray(b: any[], emptyValue: any = false): any[] {
     return r;
 }
 
-export function rearrangeBoard(b: Board): Board {
+export function rearrangeBoard(b: TBoard): TBoard {
     return rearrangeArray(b, false);
 }
 
@@ -40,7 +40,7 @@ export function removeCardsFromDeck(deck: ICard[], cards: ICard[]) {
     return deck.filter(c => cards.findIndex(r => c.shape === r.shape && c.color === r.color && c.filling === r.filling && c.count === r.count) === -1);
 }
 
-export function removeCardsFromBoard(board: Board, cards: ICard[]): Board {
+export function removeCardsFromBoard(board: TBoard, cards: ICard[]): TBoard {
     return board.map(c => {
         if (typeof c === "boolean") {
             return c;
@@ -112,7 +112,7 @@ function pickMissing(cards1: ICard[], cards2: ICard[]): ICard[] {
     return pick;
 }
 
-export function pickCardsToFormSet(board: Board, deck: ICard[], seed:number): ICard[] {
+export function pickCardsToFormSet(board: TBoard, deck: ICard[], seed:number): ICard[] {
     const empties = getEmptySlotCount(board);
     const cards: ICard[] = board.filter(c => typeof c !== "boolean") as ICard[];
 
@@ -144,11 +144,11 @@ export function pickCardsToFormSet(board: Board, deck: ICard[], seed:number): IC
 
 }
 
-export function getEmptySlotCount(board: Board): number {
+export function getEmptySlotCount(board: TBoard): number {
     return board.filter(c => typeof c === "boolean").length
 }
 
-export function fillEmptySlots(board: Board, cards: ICard[]): Board {
+export function fillEmptySlots(board: TBoard, cards: ICard[]): TBoard {
     let i = 0;
 
     return board.map(c => {

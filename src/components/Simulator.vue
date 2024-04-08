@@ -21,32 +21,32 @@ import {
     getEmptySlotCount,
     pickCardsFromTop,
     pickCardsToFormSet, removeCardsFromBoard,
-    removeCardsFromDeck
+    removeCardsFromDeck, TBoard
 } from "../boardFunctions.ts";
 import {ICard} from "../ICard.ts";
 import {computed, ref} from "vue";
-import Board from "./Board.vue";
+
 
 const rounds = ref(0);
 
 
 interface logEntry {
-    id: number,
-    deckSize: number,
-    setFound: ICard[]
-    board: Board,
-    boardAfter: Board,
-    pick: ICard[]
+    id: number;
+    deckSize: number;
+    setFound: ICard[];
+    board: TBoard;
+    boardAfter: TBoard;
+    pick: ICard[];
 }
 
 const log = ref<logEntry[]>([]);
-const heatMapData = ref([]);
+const heatMapData = ref<number[][]>([]);
 
 
 const heatMap = computed(() => {
-    const ret = Array.from(Array(12)).map(c => 0);
+    const ret = Array.from(Array(12)).map((_) => 0);
 
-    heatMapData.value.forEach(l => {
+    heatMapData.value.forEach((l:number[]) => {
         ret[l[0]] += 1;
         ret[l[1]] += 1;
         ret[l[2]] += 1;
@@ -55,14 +55,14 @@ const heatMap = computed(() => {
     return ret;
 });
 
-const heatMapMinMax = computed((): { min: number, max: number } => {
+/*const heatMapMinMax = computed((): { min: number, max: number } => {
     let min = Math.min(...heatMap.value.flat());
     let max = Math.max(...heatMap.value.flat());
 
     return {
         min, max
     }
-});
+});*/
 
 const heatMapHues = computed(() => {
     const total = heatMapData.value.length;
@@ -85,7 +85,7 @@ function simulate(id: number) {
 
     function fill() {
         const empties = getEmptySlotCount(b);
-        let pick = [];
+        let pick: ICard[] = [];
 
         pick = pickCardsToFormSet(b, d, seed)
 
@@ -122,7 +122,7 @@ function simulate(id: number) {
 
         const before = [...b];
 
-        const hl = [];
+        const hl: number[] = [];
         for (let c of s) {
             hl.push(b.indexOf(c));
         }
@@ -133,7 +133,7 @@ function simulate(id: number) {
         b = removeCardsFromBoard(b as ICard[], s);
 
 
-        let pick = []
+        let pick:ICard[] = []
         const empties = getEmptySlotCount(b);
         if (d.length >= empties) {
             pick = fill();
