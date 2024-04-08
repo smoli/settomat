@@ -59,6 +59,10 @@ h1 {
     box-shadow: 0.1em 0.1em 0.21em rgba(0, 0, 0, 0.3);
 }
 
+.card svg {
+    background-color: transparent;
+}
+
 
 .button {
     display: inline-block;
