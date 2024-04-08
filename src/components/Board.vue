@@ -2,13 +2,13 @@
     <div v-if="testMode"><h1>TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE TESTMODE</h1></div>
     <div class="info" v-if="!gameEnded">
         <span id="timer">Timer: {{ timer }}</span><br/>
-        <button v-if="!forceSet" class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">
-            Kein Set
-        </button>
-        <br v-if="!forceSet">
         <span id="setCount">Gefunden: {{ setsFound }}</span>
         <span id="points">Punkte: {{ points }}</span>
         <span id="deckSize">Stapel: {{ deck.length }}</span>
+
+        <button id="noset" v-if="!forceSet" class="button" @click="userSaysNoSet" :class="{ wrongSayingNoSet: wrongSayingNoSet }">
+            Kein Set
+        </button>
     </div>
 
     <div v-if="!gameEnded">
@@ -40,13 +40,13 @@
         <h1>Geschafft!</h1>
         <h2>Du hast {{ setsFound }} Sets gefunden und {{ points }} Punkte.</h2>
 
-<!--        <div class="game-url">
-            <h2>Verschicke diesen Link und andere können diese Kartenreihenfolge auch spielen</h2>
-            <button class="button game-url" @click="copyGameLink()">
-                <img alt="Copy SVG Vector Icon" height="20pt" decoding="async" data-nimg="1" style="color:transparent;"
-                     src="../assets/copy.svg">
-                <span>{{ gameLink }}</span></button>
-        </div>-->
+        <!--        <div class="game-url">
+                    <h2>Verschicke diesen Link und andere können diese Kartenreihenfolge auch spielen</h2>
+                    <button class="button game-url" @click="copyGameLink()">
+                        <img alt="Copy SVG Vector Icon" height="20pt" decoding="async" data-nimg="1" style="color:transparent;"
+                             src="../assets/copy.svg">
+                        <span>{{ gameLink }}</span></button>
+                </div>-->
 
 
         <button class="button" @click="reset(true)">Noch mal!</button>
@@ -54,7 +54,7 @@
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
             <div class="board" style="grid-template-columns: 0fr 1fr 1fr 1fr">
-                <div class="setFeatureCount"><span>{{getDifferingFeatureCount(...set)}}</span></div>
+                <div class="setFeatureCount"><span>{{ getDifferingFeatureCount(...set) }}</span></div>
                 <div v-for="c of set">
                     <Card
                             :shape="c.shape"
@@ -85,7 +85,7 @@ import {
     createReducedDeck,
     getASet,
     getDifferingFeatureCount,
-    isSet,
+    isSet, setSeed,
     shuffle
 } from "../deckFunctions.ts";
 import {
@@ -153,10 +153,9 @@ const cardHeight = computed(() => {
 
 function shuffleDeck(force: boolean = false) {
     if (props.seed && !force) {
-        seedUsed.value = shuffle(deck.value, Number(props.seed), true);
-    } else {
-        seedUsed.value = shuffle(deck.value);
+        seedUsed.value = setSeed(Number(props.seed));
     }
+    shuffle(deck.value, 3);
 }
 
 function onCardSelected(c: ICard) {
@@ -241,7 +240,7 @@ function fill() {
             pick = [...pick, ...pickCardsFromTop(deck.value, empties - pick.length)]
         }
 
-        shuffle(pick, seedUsed.value);
+        shuffle(pick);
 
     } else {
         pick = pickCardsFromTop(deck.value, empties);
@@ -328,8 +327,6 @@ function userSaysNoSet() {
 }
 
 let lastSetFound = [];
-
-
 
 
 const aSet = computed(() => {
@@ -426,12 +423,38 @@ span {
     background-color: red;
 }
 
+.info {
+    display: grid;
+    grid-template: "a a a" auto "b c d" auto "e e e";
+    justify-items: center;
+}
+
 #timer, #setCount, #points, #deckSize, #forceHint {
-    display: inline-block;
     font-size: 1.5em;
     font-weight: bold;
     color: #4d4d4d;
 }
+
+#timer {
+    grid-area: a;
+}
+
+#setCount {
+    grid-area: b;
+}
+
+#points {
+    grid-area: c;
+}
+
+#deckSize {
+    grid-area: d;
+}
+
+#noset {
+    grid-area: e;
+}
+
 
 @media (max-width: 600px) {
     #timer, #setCount, #points, #deckSize {
@@ -478,6 +501,10 @@ div.setFeatureCount {
     align-items: center;
     font-size: 2em;
     text-align: center;
+}
+
+button.noset {
+    display: block;
 }
 
 

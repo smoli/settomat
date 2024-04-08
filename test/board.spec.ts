@@ -7,7 +7,7 @@ import {
     rearrangeBoard,
     removeCardsFromDeck
 } from "../src/boardFunctions";
-import {checkForSet, createDeck, createReducedDeck, getASet, shuffle} from "../src/deckFunctions";
+import {checkForSet, createDeck, createReducedDeck, getASet, setSeed, shuffle} from "../src/deckFunctions";
 import {ICard} from "../src/ICard";
 
 describe("board", () => {
@@ -273,8 +273,12 @@ describe("board", () => {
         let d1 = createDeck();
         let d2 = createDeck();
 
-        shuffle(d1, seed);
-        shuffle(d2, seed, true);
+        setSeed(seed);
+
+        shuffle(d1);
+        setSeed(seed);
+        setSeed(seed);
+        shuffle(d2);
 
         expect(d1).to.deep.eq(d2);
     });

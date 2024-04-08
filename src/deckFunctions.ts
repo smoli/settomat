@@ -1,6 +1,7 @@
 import {ICard} from "./ICard.ts";
 // @ts-ignore
 import MT from "mersennetwister"
+import {it} from "vitest";
 
 
 const generator = new MT();
@@ -57,21 +58,18 @@ export function createReducedDeck(features: IFeatrues): ICard[] {
     });
 }
 
-let lastSeed = -1;
 
-export function shuffle(deck: ICard[], seed: number = -1, forceSeed: boolean = false) {
-
-    let lSeed = seed;
-
-    if (seed === -1 && lastSeed === -1) {
-        lSeed = generator.int();
+export function setSeed(seed: number = -1) {
+    if (seed === -1) {
+        const ls = generator.int();
+        generator.seed(ls);
+        return ls;
     }
+    generator.seed(seed);
+    return seed;
+}
 
-    if (lastSeed !== lSeed || forceSeed) {
-        generator.seed(lSeed);
-        lastSeed = lSeed;
-    }
-
+export function shuffle(deck: ICard[], iterations: number = 1) {
 
     function internal() {
         const r = [];
@@ -86,9 +84,9 @@ export function shuffle(deck: ICard[], seed: number = -1, forceSeed: boolean = f
         deck.push(...r);
     }
 
-    internal();
-
-    return lSeed;
+    for (let i = 0; i < iterations; i++) {
+        internal();
+    }
 }
 
 
@@ -146,7 +144,7 @@ export function getMissing(c1: ICard, c2: ICard): ICard {
     return {color, count, filling, shape}
 }
 
-export function getDifferingFeatureCount(c1:ICard, c2: ICard, c3: ICard): number {
+export function getDifferingFeatureCount(c1: ICard, c2: ICard, c3: ICard): number {
     return (different(c1.shape, c2.shape, c3.shape) ? 1 : 0) +
         (different(c1.color, c2.color, c3.color) ? 1 : 0) +
         (different(c1.count, c2.count, c3.count) ? 1 : 0) +
@@ -237,36 +235,36 @@ export function getASet(cards: ICard[]): ICard[] {
         }
         rem(cards1, c1);
     }
-/*
-    const indexes1 = Array.from(Array(cards.length)).map((_, i) => i);
-    const indexes2 = [...indexes1];
-    const indexes3 = [...indexes1];
+    /*
+        const indexes1 = Array.from(Array(cards.length)).map((_, i) => i);
+        const indexes2 = [...indexes1];
+        const indexes3 = [...indexes1];
 
-    indexes1.sort(() => 0.5 - generator.random());
-    indexes2.sort(() => 0.5 - generator.random());
-    indexes3.sort(() => 0.5 - generator.random());
+        indexes1.sort(() => 0.5 - generator.random());
+        indexes2.sort(() => 0.5 - generator.random());
+        indexes3.sort(() => 0.5 - generator.random());
 
-    for (let a of indexes1) {
-        for (let b of indexes2) {
-            if (a === b) {
-                continue;
-            }
-
-            for (let c of indexes3) {
-                if (a === b || b === c || a === c) {
+        for (let a of indexes1) {
+            for (let b of indexes2) {
+                if (a === b) {
                     continue;
                 }
 
-                const c1 = cards[a];
-                const c2 = cards[b];
-                const c3 = cards[c];
+                for (let c of indexes3) {
+                    if (a === b || b === c || a === c) {
+                        continue;
+                    }
 
-                if (isSet(c1, c2, c3)) {
-                    return [c1, c2, c3]
+                    const c1 = cards[a];
+                    const c2 = cards[b];
+                    const c3 = cards[c];
+
+                    if (isSet(c1, c2, c3)) {
+                        return [c1, c2, c3]
+                    }
                 }
             }
-        }
-    }*/
+        }*/
 
     return [];
 }
