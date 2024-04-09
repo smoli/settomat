@@ -195,11 +195,12 @@ section {
     padding: 0em 1em 1em 1em;
     box-shadow: 0.1em 0.1em 0.21em rgba(0, 0, 0, 0.3);
     text-align: left;
+    max-width: 50em;
 }
 
 
 p {
-    width: 40em;
+    display: block;
     margin-top: 0;
     margin-bottom: 1em;
 }
@@ -239,6 +240,12 @@ li {
 
 .card {
     border: 1px solid lightgray;
+}
+
+@media (max-width: 600px) {
+    section {
+        max-width: 90vw;
+    }
 }
 
 </style>
