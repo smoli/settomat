@@ -283,8 +283,4 @@ describe("board", () => {
         expect(d1).to.deep.eq(d2);
     });
 
-
-    test("theres no significant bias where sets are on the board during a game with guaranteed sets", () => {
-
-    });
 });
