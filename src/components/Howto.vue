@@ -5,7 +5,7 @@
 
         <h2>Ziel des Spiels</h2>
         <p>
-            Das Ziel des Spiels ist es so viele Punkte wie möglich zu erreichen, in dem du in den ausgelegten Karten
+            Das Ziel des Spiels ist es, so viele Punkte wie möglich zu erreichen, in dem du in den ausgelegten Karten
             <b>Sets</b> von 3 Karten findest. Hierzu klickst
             du drei Karten, von denen du denkst, dass sie ein Set bilden an. Jedes gefundene Set wird entfernt und die
             freigewordenen Plätze werden vom Stapel mit neuen Karten aufgefüllt und eine neue
@@ -231,7 +231,7 @@ div.cards p {
 }
 
 ul {
-    margin-left: 4em;
+    margin-left: 2em;
 }
 
 li {
@@ -245,6 +245,9 @@ li {
 @media (max-width: 600px) {
     section {
         max-width: 90vw;
+    }
+    ul {
+        margin-left: 1em;
     }
 }
 
