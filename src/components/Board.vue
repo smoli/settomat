@@ -53,7 +53,7 @@
         <router-link class="button" to="/">Zum Menü</router-link>
         <h2>Deine Sets</h2>
         <div v-for="set of sets">
-            <div class="board" style="grid-template-columns: 0fr 1fr 1fr 1fr">
+            <div class="board result">
                 <div class="setFeatureCount"><span>{{ getDifferingFeatureCount(set[0], set[1], set[2]) }}</span></div>
                 <div v-for="c of set">
                     <Card
@@ -65,8 +65,8 @@
                             :error="false"
                             :tip="aSet.indexOf(c) !== -1"
 
-                            :width="cardWidth"
-                            :height="cardHeight"
+                            :width="halfCardWidth"
+                            :height="halfCardHeight"
                     ></Card>
                 </div>
             </div>
@@ -148,6 +148,23 @@ const cardHeight = computed(() => {
     }
 
     return "20vh";
+})
+
+
+const halfCardWidth = computed(() => {
+    if (window.innerWidth < 600) {
+        return (44 / (boardSize.value / 3)) + "vw";
+    }
+
+    return "6vh";
+});
+
+const halfCardHeight = computed(() => {
+    if (window.innerWidth < 600) {
+        return ((5 / 6) * (88 / (boardSize.value / 3))) + "vw";
+    }
+
+    return "10vh";
 })
 
 
@@ -499,7 +516,6 @@ div.game-url h2 {
 }
 
 div.setFeatureCount {
-    margin-left: -3em;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -509,6 +525,13 @@ div.setFeatureCount {
 
 button.noset {
     display: block;
+}
+
+
+div.result {
+    padding: 1em;
+    border-radius: 1em;
+    grid-template-columns: 1fr 1fr 1fr 1fr
 }
 
 
