@@ -21,6 +21,7 @@
                       :filling="c.filling"
                       :count="c.count"
                       :selected="c.selected"
+                      :correct="c.correct"
                       :error="c.error"
                       :tip="aSet.indexOf(c) !== -1"
 
@@ -175,7 +176,13 @@ function shuffleDeck(force: boolean = false) {
     shuffle(deck.value, 1);
 }
 
+let selectionDisabled = false;
+
 function onCardSelected(c: ICard) {
+    if (selectionDisabled) {
+        return;
+    }
+
     if (!c.selected && selection.value.length >= 3) {
         return;
     }
@@ -192,13 +199,22 @@ function onCardSelected(c: ICard) {
         if (isSet(selection.value[0], selection.value[1], selection.value[2])) {
             setsFound.value += 1;
             rewardPoints();
-            timer.value = timerDefault;
-            sets.value.push([selection.value[0], selection.value[1], selection.value[2]]);
-            removeCards(selection.value);
-            shrink(12);
-            fill();
-            selection.value = []
-            lastSetFound = []
+            selectionDisabled = true;
+            selection.value[0].correct = selection.value[1].correct = selection.value[2].correct = true;
+            stopTimer();
+            setTimeout(() => {
+                timer.value = timerDefault;
+                startTimer();
+                sets.value.push([selection.value[0], selection.value[1], selection.value[2]]);
+                removeCards(selection.value);
+                shrink(12);
+                fill();
+                selection.value = []
+                lastSetFound = [];
+                selectionDisabled = false;
+            }, 1000);
+
+
         } else {
             deductPoints(timer.value);
 
@@ -420,7 +436,7 @@ function reset(force: boolean = false) {
     stopTimer();
     boardSize.value = 12;
     resetDeck();
-    shuffleDeck(force);
+    // shuffleDeck(force);
     clearBoard();
     fill();
     startTimer();
@@ -474,6 +490,7 @@ span {
 
 #noset {
     grid-area: e;
+    margin-bottom: -1em;
 }
 
 

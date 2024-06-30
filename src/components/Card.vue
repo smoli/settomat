@@ -1,5 +1,5 @@
 <template>
-    <div class="card" :class="{ selected: selected, error: error }" @click="onClicked()" :style="{ width: props.width, height: props.height }">
+    <div class="card" :class="{ correct: correct, selected: selected && !correct, error: error }" @click="onClicked()" :style="{ width: props.width, height: props.height }">
         <svg v-if="!back" class="render" viewBox="-300 -500 600 1000">
 
             <g transform="translate(-200, -450) scale(10, 10) rotate(45)" v-if="tip">
@@ -35,6 +35,7 @@ const props = defineProps<{
     filling?: number,
     count?: number,
     selected?: boolean,
+    correct?: boolean,
     error?: boolean,
     back?: boolean,
     tip?: boolean,
@@ -92,10 +93,23 @@ function onClicked() {
 <style scoped>
 
 
+.card {
+    transition: transform 0.5s;
+}
+
 .card.selected {
     border-color: #494949;
+    transform: scale(1.05);
     /*box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.3);*/
 }
+
+.card.correct {
+    border-color: #ffb800;
+    transform: rotate3d(0, 1, 0, 90deg);
+    transition: transform 0.5s;
+    /*box-shadow: 0.5em 0.5em 1em rgba(0, 0, 0, 0.3);*/
+}
+
 
 .card.error {
     border-color: #ff0000;

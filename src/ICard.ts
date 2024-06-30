@@ -5,5 +5,6 @@ export interface ICard {
     filling: number,
     count: number,
     selected?: boolean,
+    correct?: boolean,
     error?: boolean
 }
